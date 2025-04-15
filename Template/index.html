@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Downloader</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    textarea, input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 15px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Image Downloader</h1>
+
+  <form id="download-form">
+    <label for="queries">Search Queries (one per line):</label>
+    <textarea id="queries" rows="6" placeholder="e.g.\nPneumonia X-ray\nHealthy Lung X-ray"></textarea>
+
+    <label for="limit">Images per query:</label>
+    <input type="number" id="limit" value="10" min="1" />
+
+    <button type="submit">Start Download</button>
+  </form>
+
+  <div class="status" id="status"></div>
+
+  <script>
+    document.getElementById("download-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const queriesText = document.getElementById("queries").value.trim();
+      const limit = parseInt(document.getElementById("limit").value);
+      const status = document.getElementById("status");
+
+      if (!queriesText) {
+        status.textContent = "Please enter at least one search query.";
+        status.style.color = "red";
+        return;
+      }
+
+      const lines = queriesText.split('\n').filter(Boolean);
+      const queries = {};
+      lines.forEach(q => {
+        queries[q] = q.replace(/\s+/g, '_');
+      });
+
+      status.textContent = "Downloading images...";
+
+      try {
+        const res = await fetch("http://localhost:5000/download-images", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ queries, limit })
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          status.textContent = "✅ Download complete!";
+          status.style.color = "green";
+        } else {
+          status.textContent = `❌ Error: ${result.error}`;
+          status.style.color = "red";
+        }
+      } catch (err) {
+        status.textContent = "❌ Request failed. Is the backend running?";
+        status.style.color = "red";
+      }
+    });
+  </script>
+
+</body>
+</html>
