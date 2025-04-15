@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify,render_template
 from flask_cors import CORS
 from downloadImage import image_downloader
+import os
 
 app = Flask(__name__,template_folder="Template")
 CORS(app)  # Allow requests from the web browser
@@ -17,7 +18,7 @@ def download_images():
 
     # debug the Attributes
     print(f'{queries=}')
-    
+
     if not queries:
         return jsonify({"error": "No queries provided"}), 400
 
@@ -28,4 +29,5 @@ def download_images():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # default to 5000 if not set
+    app.run(host='0.0.0.0', port=port)
