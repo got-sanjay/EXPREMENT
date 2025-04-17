@@ -82,10 +82,10 @@ Every 20 minutes, the app will automatically delete old downloaded folders and Z
 ---
 ## 📜 License
 This project is licensed under the MIT License.
-See the ![LICENSE](LICENSE) file for full details.
+See the [LICENSE](LICENSE) file for full details.
 ---
 ## 👤 Author
 **Sanjay Kumar**
-![Linkedin](https://www.linkedin.com/in/gotsanjay) - ![GitHub](https://github.com/got-sanjay)
+[Linkedin](https://www.linkedin.com/in/gotsanjay) - [GitHub](https://github.com/got-sanjay)
 ---
 > Created with ❤️ by [Sanjaykumar](https://www.linkedin.com/in/gotsanjay)
