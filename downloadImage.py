@@ -2,6 +2,10 @@
 import os
 import glob
 from icrawler.builtin import GoogleImageCrawler
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def create_folder(path):
     """
@@ -11,12 +15,15 @@ def create_folder(path):
         path (str): The path of the folder to create.
     """
     try:
+        # debugg Attribute
+        logger.info(f'{path=}')
+
         os.makedirs(path, exist_ok=True)
     except Exception as e:
-        print(f"[ERROR] Failed to create directory '{path}': {e}")
+        logger.error(f"Failed to create directory '{path}': {e}")
 
 
-def download_images(query, output_dir, limit=10):
+def download_images(query:str, output_dir:str, limit:int=10):
     """
     Download images from Google using the icrawler library.
 
@@ -26,11 +33,11 @@ def download_images(query, output_dir, limit=10):
         limit (int): Maximum number of images to download.
     """
     try:
-        print(f"\n[INFO] Downloading {limit} images for '{query}'...")
+        logger.info(f"Downloading {limit} images for '{query}'...")
         crawler = GoogleImageCrawler(storage={"root_dir": output_dir})
         crawler.crawl(keyword=query, max_num=limit)
     except Exception as e:
-        print(f"[ERROR] Failed to download images for '{query}': {e}")
+        logger.error(f"Failed to download images for '{query}': {e}")
 
 
 def rename_images_in_folder(folder_path, prefix):
@@ -50,11 +57,11 @@ def rename_images_in_folder(folder_path, prefix):
                 new_path = os.path.join(folder_path, new_name)
                 os.rename(img_path, new_path)
             except Exception as e:
-                print(f"[WARNING] Failed to rename {img_path}: {e}")
+                logger.warning(f'Failed to rename {img_path}: {e}')
     except Exception as e:
-        print(f"[ERROR] Failed to access folder '{folder_path}': {e}")
+        logger.error(f"Failed to access folder '{folder_path}': {e}")
 
-def image_downloader(queries: dict, base_dir="data", limit=10):
+def image_downloader(queries: dict[str:str], base_dir="static/data", limit=10,session_id=None):
     """
     Download and rename images for each query-category pair.
 
