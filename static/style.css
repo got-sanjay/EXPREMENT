@@ -1,0 +1,317 @@
+/* General theme styling */
+:root[data-theme='light'] {
+  --bg-color: #ffffff6c;
+  /* warm light background */
+  --text-color: #212529;
+  /* dark gray text */
+  --border-color: #ebca99;
+  /* soft orange border */
+  --input-bg: #fcf7f0f1;
+  /* orange-tinted input background */
+  --input-txt: #212529;
+  --card-bg: #ffffff5f;
+  /* still white for clean cards */
+  --shadow-color: rgba(255, 165, 0, 0.1);
+  /* orange shadow */
+
+  --accent-color: #f7c594;
+  /* for buttons and highlights */
+}
+
+:root[data-theme='dark'] {
+  --bg-color: #1e1a16;
+  /* rich dark brown-orange base */
+  --text-color: #f8e8d8;
+  /* soft beige-white text */
+  --border-color: #453930;
+  /* burnt orange/caramel border */
+  --input-bg: #2b2420;
+  /* deep brownish input bg */
+  --input-txt: #f8e8d8;
+  --card-bg: #2a211b5f;
+  /* dark card with slight warmth */
+  --shadow-color: rgba(255, 183, 77, 0.05);
+  /* soft orange glow */
+
+  --accent-color: #f4b06a;
+  /* warm orange accent */
+}
+
+.fixed {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 500px;
+  max-width: 500px;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.bg-light,
+.bg-white {
+  background-color: var(--bg-color) !important;
+}
+
+.text-dark {
+  color: var(--text-color) !important;
+}
+
+.card,
+.form-control,
+.btn {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 2px 4px var(--shadow-color) !important;
+}
+
+textarea.form-control,
+input.form-control {
+  background-color: var(--input-bg) !important;
+  color: var(--input-txt) !important;
+}
+
+/* Form Layout */
+#download-form {
+  background-color: var(--card-bg) !important;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 0 10px var(--shadow-color) !important;
+}
+
+[data-theme="dark"] #download-form {
+  background-color: var(--card-bg) !important;
+}
+
+.card-style {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  padding: 1.5rem;
+  margin-top: 2rem;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+#download-form {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Feedback alert styling */
+.alert {
+  margin-top: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Buttons */
+.btn-primary {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.back-btn,
+.download-btn {
+  margin-right: 1rem;
+  font-weight: 500;
+}
+
+/* Hidden utility */
+.hidden {
+  display: none !important;
+}
+
+/* Gallery Layout */
+.image-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Gallery Images */
+.image-item {
+  display: inline-block;
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.image-item:hover {
+  transform: scale(1.02);
+}
+
+/* Toggle button visibility */
+.view-toggle.hidden {
+  display: none !important;
+}
+
+.theme-switch {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-label {
+  width: 60px;
+  height: 30px;
+  background: var(--border-color);
+  border-radius: 30px;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  transition: background 0.3s ease;
+}
+
+.toggle-label .icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.toggle-label .moon {
+  left: 8px;
+}
+
+.toggle-label .sun {
+  right: 8px;
+}
+
+.toggle-label .ball {
+  width: 26px;
+  height: 26px;
+  background: #e2e2e2;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left 0.2s ease, background 0.3s ease;
+}
+
+/* When toggled (light mode) */
+#theme-toggle:checked+.toggle-label .ball {
+  left: 32px;
+}
+
+.toggle-label {
+  background: rgb(255, 188, 63);
+  /* dark bg */
+}
+
+#theme-toggle:checked+.toggle-label {
+  background: #333;
+}
+
+.theme-switch {
+  margin-left: 1rem;
+  /* or 8px/16px as needed */
+}
+
+/* offline page  */
+.offline-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.offline-content {
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.offline-img {
+  width: 180px;
+  max-width: 80%;
+}
+
+/* spyter web background  */
+#spider-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  /* So it doesn't block clicks */
+}
+
+/* info style */
+.fixed-info-button {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: var(--bg-color);
+  color: white;
+  border-radius: 50%;
+  z-index: 8;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.fixed-info-button i {
+  color: var(--input-txt);
+}
+
+.fixed-info-button:hover {
+  transform: scale(1.1);
+}
+
+.offline-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.offline-content {
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 30px var(--shadow-color);
+}
+
+.offline-img {
+  max-width: 150px;
+  margin-bottom: 1rem;
+}
+
+.d-none {
+  display: none;
+}
