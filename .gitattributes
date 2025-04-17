@@ -1,3 +1,12 @@
 venv/* filter=lfs diff=lfs merge=lfs -text
 venv/Lib/site-packages/clang/native/libclang.dll filter=lfs diff=lfs merge=lfs -text
 venv/Lib/site-packages/tensorflow/python/_pywrap_tensorflow_internal.pyd filter=lfs diff=lfs merge=lfs -text
+# Auto-detect text files and ensure correct line endings
+* text=auto
+
+# Treat all .html and .css files as UTF-8
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+*.py   text eol=lf
+*.md   text eol=lf

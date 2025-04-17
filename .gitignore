@@ -1,9 +1,24 @@
-# Ignore virtual environment
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
 venv/
 
-# Other ignores
-__pycache__/
+# Flask cache
+instance/
 *.pyc
-.DS_Store
+
+# Environment variables
 .env
-/data
+
+# Downloads & generated content
+static/downloads/
+static/zips/
+
+# VS Code settings
+.vscode/
+
+# MacOS/Linux
+.DS_Store
+Thumbs.db
