@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+
+{% block title %}Downloaded Images{% endblock %}
+{% block style %}
+<style>
+  /* General Page Styling */
+  body {
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .card {
+    background-color: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Heading and Buttons */
+  h4 {
+    font-weight: 600;
+  }
+
+  .btn i {
+    margin-right: 0.3em;
+  }
+
+  .view-toggle {
+    margin-top: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* Image Styling */
+  .image-item {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    transition: transform 0.3s ease;
+  }
+
+  .image-item:hover {
+    transform: scale(1.05);
+    z-index: 2;
+  }
+
+  /* Gallery Layout */
+  .gallery {
+    padding: 0.5rem;
+  }
+
+  .image-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    justify-items: center;
+  }
+
+  .image-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Apply to both buttons */
+  .responsive-btn {
+    box-sizing: border-box;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    min-width: 150px;
+    text-align: center;
+  }
+
+  /* Smaller tweak for very narrow screens (≤ 320px) */
+  @media (max-width: 340px) {
+    .responsive-btn span {
+      display: none;
+    }
+  }
+
+  @media (max-width: 430px) {
+    .responsive-btn {
+      font-size: 0.75rem;
+      padding: 0.4rem 0.6rem;
+      min-width: 120px;
+    }
+
+    .btn i {
+      margin-right: 0.2em;
+    }
+  }
+
+  /* Responsive grid spacing */
+  @media (max-width: 600px) {
+    .image-group {
+      gap: 0.75rem;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .image-group {
+      gap: 0.5rem;
+    }
+  }
+
+  /* Responsive Columns Fixes */
+  @media (max-width: 576px) {
+    .col-6 {
+      padding-left: 4px;
+      padding-right: 4px;
+    }
+  }
+
+  /* Light & Dark Mode Variables */
+  :root {
+    --card-bg: #ffffff;
+  }
+
+  body.dark-mode {
+    --card-bg: #1e1e2f;
+    background-color: #12121a;
+    color: #e0e0e0;
+  }
+
+  body.dark-mode .btn-outline-primary {
+    border-color: #5fa8ff;
+    color: #5fa8ff;
+  }
+
+  body.dark-mode .btn-outline-primary:hover {
+    background-color: #5fa8ff;
+    color: #fff;
+  }
+
+  body.dark-mode .btn-outline-secondary {
+    border-color: #aaa;
+    color: #aaa;
+  }
+
+  body.dark-mode .btn-outline-secondary:hover {
+    background-color: #aaa;
+    color: #000;
+  }
+</style>
+{% endblock %}
+{% block body %}
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+  <div class="container py-3 form-wrapper card-style">
+    <header class="d-flex justify-content-between align-items-center mb-2 py-2">
+      <h1 class="fw-semibold fs-4 m-0 me-3">Your Images</h1>
+      <div class="theme-switch ms-3">
+        <input type="checkbox" id="theme-toggle" hidden>
+        <label for="theme-toggle" class="toggle-label">
+          <span class="icon moon"><i class="fas fa-moon"></i></span>
+          <span class="icon sun"><i class="fas fa-sun"></i></span>
+          <span class="ball"></span>
+        </label>
+      </div>
+    </header>
+    <main>
+      <div class="mb-3 d-flex justify-content-between">
+        <a href="/" class="btn btn-outline-primary responsive-btn">
+          <i class="fas fa-home"></i> <span>Back to Home</span>
+        </a>
+        <a href="/download-zip/{{ session_id }}" class="btn btn-success responsive-btn" download>
+          <i class="fas fa-file-archive"></i> <span>Download All (ZIP)</span>
+        </a>
+      </div>
+
+      <div class="p-4 mb-4">
+        <div class="gallery">
+          {% set category_index = 0 %}
+          {% for category, images in images_by_category.items() %}
+          {% set category_index = category_index + 1 %}
+
+          <div class="mb-4">
+            <h4 class="mb-3 text-color">{{ category }}</h4>
+            <div class="image-group" id="group-{{ category_index }}">
+              {% for img in images %}
+              <div class="image-wrapper">
+                <img src="{{ img }}" alt="{{ category }}"
+                  class="img-fluid rounded shadow-sm image-item group-{{ category_index }}"
+                  data-index="{{ loop.index }}">
+              </div>
+              {% endfor %}
+            </div>
+
+            {% if images|length > 3 %}
+            <div class="text-end">
+              <button class="btn btn-sm btn-outline-secondary view-toggle hidden"
+                onclick="toggleExtra({{category_index}})" id="toggle-{{ category_index }}" data-expanded="false">
+                View More
+              </button>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function toggleExtra(groupId) {
+    const groupImgs = document.querySelectorAll(`.group-${groupId}`);
+    const toggleBtn = document.getElementById(`toggle-${groupId}`);
+    const showing = toggleBtn.dataset.expanded === "true";
+
+    groupImgs.forEach((img, i) => {
+      const index = parseInt(img.dataset.index, 10) - 1;
+      if (showing) {
+        img.style.display = shouldBeVisible(index) ? "block" : "none";
+      } else {
+        img.style.display = "block";
+      }
+    });
+
+    toggleBtn.textContent = showing ? "View More" : "View Less";
+    toggleBtn.dataset.expanded = (!showing).toString();
+  }
+
+  function shouldBeVisible(index) {
+    const width = window.innerWidth;
+    const limits = { xs: 2, sm: 3, md: 4, lg: 9, xl: 12 };
+    let limit;
+
+    if (width <= 325) limit = limits.xs;
+    else if (width <= 380) limit = limits.sm;
+    else if (width <= 430) limit = limits.md;
+    else if (width <= 770) limit = limits.lg;
+    else limit = limits.xl;
+
+    return index < limit;
+  }
+
+  function getGroupIdFromClass(classList) {
+    for (const cls of classList) {
+      if (cls.startsWith("group-")) {
+        return cls.split("-")[1];
+      }
+    }
+    return null;
+  }
+
+  function updateToggleVisibility() {
+    document.querySelectorAll(".view-toggle").forEach(toggleBtn => {
+      const groupId = toggleBtn.id.split("-")[1];
+      const groupImgs = document.querySelectorAll(`.group-${groupId}`);
+      let visibleCount = 0;
+
+      groupImgs.forEach((img, i) => {
+        const index = parseInt(img.dataset.index, 10) - 1;
+        if (shouldBeVisible(index)) visibleCount++;
+      });
+
+      if (visibleCount < groupImgs.length) {
+        toggleBtn.classList.remove("hidden");
+      } else {
+        toggleBtn.classList.add("hidden");
+      }
+    });
+  }
+
+  window.addEventListener("load", () => {
+    document.querySelectorAll(".image-item").forEach(img => {
+      const index = parseInt(img.dataset.index, 10) - 1;
+      img.style.display = shouldBeVisible(index) ? "block" : "none";
+    });
+    updateToggleVisibility();
+  });
+
+  window.addEventListener("resize", () => {
+    document.querySelectorAll(".image-item").forEach(img => {
+      const index = parseInt(img.dataset.index, 10) - 1;
+      const toggleBtn = document.querySelector(`#toggle-${getGroupIdFromClass(img.classList)}`);
+      if (!toggleBtn || toggleBtn.dataset.expanded === "true") return;
+      img.style.display = shouldBeVisible(index) ? "block" : "none";
+    });
+    updateToggleVisibility();
+  });
+</script>
+{% endblock %}

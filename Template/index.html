@@ -1,97 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Image Downloader</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #f9f9f9;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
-    }
-    textarea, input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .status {
-      margin-top: 15px;
-      font-weight: bold;
-      color: green;
-    }
-  </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-  <h1>Image Downloader</h1>
+{% block title %}Image Downloader{% endblock %}
+{% block body %}
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+  <div class="container py-3 form-wrapper card-style fixed">
+    <header class="d-flex justify-content-between align-items-center mb-2 py-2">
+      <h1 class="fw-semibold fs-4 m-0 me-3">Image Downloader</h1>
+      <div class="theme-switch ms-3">
+        <input type="checkbox" id="theme-toggle" hidden>
+        <label for="theme-toggle" class="toggle-label">
+          <span class="icon moon"><i class="fas fa-moon"></i></span>
+          <span class="icon sun"><i class="fas fa-sun"></i></span>
+          <span class="ball"></span>
+        </label>
+      </div>
+    </header>
 
-  <form id="download-form">
-    <label for="queries">Search Queries (one per line):</label>
-    <textarea id="queries" rows="6" placeholder="e.g.\nPneumonia X-ray\nHealthy Lung X-ray"></textarea>
+    <main>
 
-    <label for="limit">Images per query:</label>
-    <input type="number" id="limit" value="10" min="1" />
+      <form id="download-form" class="mb-4">
+        <div class="mb-3">
+          <label for="queries" class="form-label">Search Queries (one per line):</label>
+          <textarea id="queries" rows="6" class="form-control" placeholder="e.g. Dog X-ray"></textarea>
+          <div class="invalid-feedback">
+            Please enter at least one search query.
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="limit" class="form-label">Images per query:</label>
+          <input type="number" id="limit" value="10" min="1" class="form-control" />
+          <div class="invalid-feedback">
+            Please enter a valid number.
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="fas fa-download"></i> Start Download
+        </button>
+      </form>
 
-    <button type="submit">Start Download</button>
-  </form>
+      <div class="alert" id="status" style="display: none;"></div>
+    </main>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const form = document.getElementById("download-form");
 
-  <div class="status" id="status"></div>
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  <script>
-    document.getElementById("download-form").addEventListener("submit", async function (e) {
-      e.preventDefault();
+    const queriesText = document.getElementById("queries").value.trim();
+    const limit = parseInt(document.getElementById("limit").value);
+    const $status = $("#status");
+    const submitBtn = form.querySelector("button[type='submit']");
 
-      const queriesText = document.getElementById("queries").value.trim();
-      const limit = parseInt(document.getElementById("limit").value);
-      const status = document.getElementById("status");
+    // Show status with icon, fade & scale effect
+    function showStatus(message, type = "danger", icon = "fa-info-circle") {
+      const $status = $("#status");
 
-      if (!queriesText) {
-        status.textContent = "Please enter at least one search query.";
-        status.style.color = "red";
-        return;
-      }
-
-      const lines = queriesText.split('\n').filter(Boolean);
-      const queries = {};
-      lines.forEach(q => {
-        queries[q] = q.replace(/\s+/g, '_');
-      });
-
-      status.textContent = "Downloading images...";
-
-      try {
-        const res = await fetch("http://localhost:5000/download-images", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ queries, limit })
+      $status
+        .stop(true, true)
+        .hide()
+        .html(`<i class="fas ${icon} me-2"></i>${message}`)
+        .removeClass()
+        .addClass(`alert alert-${type}`)
+        .css({
+          opacity: 0,
+          transform: "scale(1.1) translate(0, 0)",
+          transition: "none"
+        })
+        .slideDown(0)
+        .animate({ opacity: 1 }, {
+          duration: 400,
+          step: function (now, fx) {
+            if (fx.prop === "opacity") {
+              const scale = 1.1 - (1.1 - 1) * now;
+              $(this).css("transform", `scale(${scale}) translate(0, 0)`);
+            }
+          }
         });
 
-        const result = await res.json();
-        if (res.ok) {
-          status.textContent = "✅ Download complete!";
-          status.style.color = "green";
-        } else {
-          status.textContent = `❌ Error: ${result.error}`;
-          status.style.color = "red";
-        }
-      } catch (err) {
-        status.textContent = "❌ Request failed. Is the backend running?";
-        status.style.color = "red";
-      }
-    });
-  </script>
+      // Auto-hide with move to top-left, fade, and shrink
+      setTimeout(() => {
+        $status.animate({ opacity: 0 }, {
+          duration: 1000,
+          step: function (now, fx) {
+            if (fx.prop === "opacity") {
+              const scale = now;
+              const x = -50 * (1 - now); // move left
+              const y = -50 * (1 - now); // move up
+              $(this).css("transform", `scale(${scale}) translate(${x}px, ${y}px)`);
+            }
+          },
+          complete: function () {
+            $(this).hide();
+          }
+        });
+      }, 3000);
+    }
 
-</body>
-</html>
+    if (!queriesText) {
+      // showStatus("Please enter at least one search query.", "danger", "fa-times-circle");
+      // Highlight and focus the textarea
+      const queryBox = document.getElementById("queries");
+      queryBox.classList.add("is-invalid"); // Bootstrap red border
+      queryBox.focus();
+      return;
+    } else {
+      document.getElementById("queries").classList.remove("is-invalid");
+    }
+    if (!limit || limit < 1) {
+      // showStatus("Please enter at least one search query.", "danger", "fa-times-circle");
+      // Highlight and focus the textarea
+      const limtbox = document.getElementById("limit");
+      limtbox.classList.add("is-invalid"); // Bootstrap red border
+      limtbox.focus();
+      return;
+    } else {
+      document.getElementById("queries").classList.remove("is-invalid");
+    }
+    // UI feedback
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Downloading...';
+
+    const lines = queriesText.split('\n').filter(Boolean);
+    const queries = {};
+    lines.forEach(q => queries[q] = q.replace(/\s+/g, '_'));
+
+    try {
+      const res = await fetch("/download-images", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ queries, limit })
+      });
+
+      const result = await res.json();
+      if (res.ok && result.redirect) {
+        window.location.href = result.redirect;
+      } else {
+        showStatus(`Error: ${result.error}`, "danger", "fa-exclamation-triangle");
+      }
+
+    } catch (err) {
+      showStatus("Request failed. Is the server running?", "danger", "fa-server");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-download"></i> Start Download';
+    }
+  });
+</script>
+{% endblock %}

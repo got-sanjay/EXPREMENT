@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Cleanup Info{% endblock %}
+
+{% block style %}
+<style>
+    .cleanup-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        /* 👈 This ensures full screen height */
+        background: var(--card-bg);
+        /* translucent overlay */
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        color: var(--text-color);
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .offline-content {
+        margin: auto;
+        text-align: center;
+        max-width: 600px;
+        padding: 2rem;
+    }
+
+    .cleanup-wrapper img {
+        max-width: 200px;
+        margin-bottom: 1rem;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-8px);
+        }
+    }
+
+    .cleanup-wrapper h1 {
+        font-size: 2.2rem;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+    }
+
+    .cleanup-wrapper p {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+
+    .cleanup-wrapper p i {
+        margin-right: 6px;
+        color: var(--input-txt);
+    }
+
+    @media (max-width: 420px) {
+        .cleanup-btn {
+            display: block;
+            margin: 1rem auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="cleanup-wrapper">
+    <div class="theme-switch ms-3 mt-3">
+        <input type="checkbox" id="theme-toggle" hidden>
+        <label for="theme-toggle" class="toggle-label">
+            <span class="icon moon"><i class="fas fa-moon"></i></span>
+            <span class="icon sun"><i class="fas fa-sun"></i></span>
+            <span class="ball"></span>
+        </label>
+    </div>
+    <div class="offline-content align-items-center">
+        <!-- 👇 Centered image -->
+        <img src="/static/image/Oops.png" alt="Oops image">
+
+        <h1><i class="fa fa-broom"></i> Oops Time Up</h1>
+        <p>Last Cleanup Run:<br>{{ log.last_run or "Not yet run" }}</p>
+        <p><i class="fa fa-folder-open"></i> Folders Deleted: {{ log.folders_deleted }}</p>
+        <p><i class="fa fa-file-archive"></i> ZIPs Deleted: {{ log.zips_deleted }}</p>
+        <div>
+            <a class="btn responsive-btn secondary" href="/">
+                <i class="fa fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
