@@ -78,7 +78,7 @@ def show_gallery(session_id):
     for root, _, files in os.walk(folder_path):
         for file in files:
             rel_path = os.path.relpath(os.path.join(root, file), "static")
-            img_url = f"/static/{rel_path.replace('\\','/')}"
+            img_url = "/static/" + rel_path.replace("\\", "/")
             category = file.split("_")[0]  # Assuming file name is like Healthy_0.jpg
             if category not in images_by_category:
                 images_by_category[category] = []
