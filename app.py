@@ -72,8 +72,8 @@ def show_gallery(session_id):
     zip_path = os.path.join("static", "zips", f"{session_id}.zip")
 
     if not os.path.exists(folder_path):
-        return "Gallery not found", 404
-
+        return render_template("cleanup.html", log=cleanup_log)
+    
     images_by_category = {}
     for root, _, files in os.walk(folder_path):
         for file in files:
